@@ -168,17 +168,18 @@ quiz = [
 ]
 
 user_answers = []
-submitted = st.button("Υποβολή απαντήσεων")
 
 # Καταγραφή απαντήσεων πριν την υποβολή
 for i, q in enumerate(quiz):
     st.markdown(f"### {q['question']}")
     if q["type"] == "radio":
-        ans = st.radio("Επιλογή:", q["options"], key=i)
+        ans = st.radio("Επιλογή:", q["options"], index=None, key=f"q{i}")
         user_answers.append(ans)
     elif q["type"] == "checkbox":
-        ans = st.multiselect("Επιλογές:", q["options"], key=i)
+        ans = st.multiselect("Επιλογές:", q["options"], key=f"q{i}")
         user_answers.append(ans)
+
+submitted = st.button("✅ Υποβολή απαντήσεων")
 
 # Υπολογισμός αποτελέσματος
 if submitted:
@@ -188,10 +189,11 @@ if submitted:
         st.markdown(f"**{q['question']}**")
         if q["type"] == "radio":
             correct = q["options"][q["answer"]]
-            is_correct = user_answers[i] == correct
+            user_ans = user_answers[i]
+            is_correct = user_ans == correct
             if is_correct:
                 score += 1
-            st.markdown(f"- Η απάντησή σου: {user_answers[i]}")
+            st.markdown(f"- Η απάντησή σου: {user_ans if user_ans else 'Καμία απάντηση'}")
             st.markdown(f"- ✅ Σωστή απάντηση: {correct}")
         elif q["type"] == "checkbox":
             correct_set = set([q["options"][j] for j in q["answer"]])
@@ -199,12 +201,13 @@ if submitted:
             is_correct = user_set == correct_set
             if is_correct:
                 score += 1
-            st.markdown(f"- Η απάντησή σου: {', '.join(user_answers[i])}")
+            st.markdown(f"- Η απάντησή σου: {', '.join(user_set) if user_set else 'Καμία απάντηση'}")
             st.markdown(f"- ✅ Σωστές απαντήσεις: {', '.join(correct_set)}")
         st.markdown(f"ℹ️ **Επεξήγηση:** {q['explanation']}")
         st.markdown("---")
 
     st.success(f"🎉 Το τελικό σου σκορ: **{score} / {len(quiz)}**")
+
 
 st.markdown("---")
 st.caption("Δημιουργήθηκε για εκπαιδευτική χρήση από τον/την εκπαιδευτικό σας 👩‍🏫")
